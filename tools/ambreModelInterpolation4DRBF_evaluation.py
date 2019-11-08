@@ -57,6 +57,12 @@ class AmbreInterpolation:
     def interpolate(self, nProcs=1):        
         """ Do interpolation
 
+        Return an interpolated spectrum and names of models used for the interpolation.
+
+        Usage
+        ---------
+        interpolation, neighborModels = interpolate(nProcs)
+
         Parameter
         ---------
         --nProcs : Number of processes for multiprocessing; the default is 1 (sigle process). Type = int
@@ -99,14 +105,14 @@ class AmbreInterpolation:
         ## initial set
         numOfModelsAlongTeff = numOfModelsAlongLogg = numOfModelsAlongMetal = numOfModelsAlongAlpha = 0
         indexTeffRange = indexLoggRange = indexMetalRange = indexAlphaRange = 0
-        requiredNumberOfParameters = 4
+        requiredNumberOfParameters = 3
 
         ## Search ranges of parameters which enclos a sepcified number of steps ('requiredNumberOfParameters')
-        while numOfModelsAlongTeff < requiredNumberOfParameters:
+        while numOfModelsAlongTeff < requiredNumberOfParameters + 1:
             neighborModel = fetchNeighborModels(self, indexTeffRange, indexLoggRange, 
                                                 indexMetalRange, indexAlphaRange, referenceModelName)
             numOfModelsAlongTeff = len(neighborModel['Teff'].unique())
-            if numOfModelsAlongTeff >= requiredNumberOfParameters: 
+            if numOfModelsAlongTeff >= requiredNumberOfParameters + 1: 
                 break
             indexTeffRange = indexTeffRange + 1
             if indexTeffRange > len(teffRange) -1:
@@ -155,14 +161,14 @@ class AmbreInterpolation:
             
             with fits.open(self.path2Spectrum + neighborModelName.reset_index(drop=True)[0]) as tempModelFITS:
                 tempModel = Table(tempModelFITS[1].data).to_pandas()
-#            neighborModelFlux = np.empty((len(tempModel), len(neighborModelName)), dtype='float64')
-            neighborModelFlux = np.empty((100, len(neighborModelName)), dtype='float64')
+            neighborModelFlux = np.empty((len(tempModel), len(neighborModelName)), dtype='float64')
+#            neighborModelFlux = np.empty((1000, len(neighborModelName)), dtype='float64')
             
             for i, row in enumerate(neighborModelName):
                 with fits.open(self.path2Spectrum + row) as modelFITS:
                     model = Table(modelFITS[1].data).to_pandas()
-#                neighborModelFlux[:,i] = model['Flux']
-                neighborModelFlux[:,i] = model['Flux'][:100]
+                neighborModelFlux[:,i] = model['Flux']
+#                neighborModelFlux[:,i] = model['Flux'][:1000]
             
             def rbfInterpolate(neighborModelFlux):
                 interpolationFunction = Rbf(neighborModelParameter[:,0]/1e3, neighborModelParameter[:,1], 
@@ -173,9 +179,10 @@ class AmbreInterpolation:
 
             result = parallel.parallel_map(rbfInterpolate, neighborModelFlux, n_procs=nProcs)
             result = np.hstack(result)           
-            return result
+            return result, neighborModelName.values
 
         else:
             print('Not enough number of parameters. This process ends')  
             return np.array([])
+
 
