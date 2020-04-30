@@ -59,4 +59,3 @@ def makeRBFInterpolationModel(inputDir, inputList, output, n_procs):
 
 if __name__ == '__main__':
     makeRBFInterpolationModel(inputDir, inputList, output, n_procs)
-
