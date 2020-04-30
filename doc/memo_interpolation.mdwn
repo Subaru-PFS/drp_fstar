@@ -1,0 +1,26 @@
+# Spectral template interpolation of AMBRE
+Stellar model templates for flux calibration are prepared based on the AMBRE template set. To obatain models at smaller parameter steps than the original ones of AMBRE, the AMBRE templates are interpolated along model parameters (effective temperature, surface gravity, metallicity, and alpha element index) using the radial basis function. 
+
+## AMBRE
+<!-- ### About AMBRE -->
+AMBRE is the high resolution stellar model templates (de Laverny et al. 2012, A&A, 544, 126). It covers a wavelength range from 300 nm to 1200 nm. The original resolution is 0.001 nm/pix. There are four parameters of Teff, log(g), Z, [alphe/Fe]. 
+
+<!-- ### Input data for interpolation -->
+Out of the AMBRE templates, 3190 model templates with Teff = 5500 - 8000 K and plane-parallel atmosphere are used as input data of the interpolation.
+The wavelength pixel of the input templates are binned into 0.01 nm/pix to reduce a number of calculation.
+They are stored as a FITS format file of 0.4 MB size. In total, 1.27 GB.
+
+
+## Interpolation method
+Interplated spectral template is produced using the radial basis function (RBF) interpolation (`scipy.interpolate.Rbf`). Four dimensional interpolation (Teff, log(g), Z, [alpha/Fe]) at each wavelength pixel is performed with `multiquadric` Kernel.
+
+A single RBF model is generated and is save as a pickle file through `makeRBFInterpolationModel.py`. `modelInterpolation.py` reads this model file.
+In the NAOJ computer, it takes about 16 hours to generate a RBF model. The size of the RBF pickle model file is 15 GB.
+
+The accuracy of interpolated models is high and RMS is less than 1% in most cases, but low accuracies of >1% RMSs are observed in some cases (12% of all 192 test parameter points).
+
+## Codes 
+- `makeRBFInterpolationModel.py` \
+Generate an RBF model of a pickle file. Need to specify a location of AMBRE templates, a file name of an input table listing ABMRE templates, a file name of an output model, and a number of processes for parallel processing. Require `parallel.py`.
+- `modelInterpolation.py`\
+Read an RBF pickle model file and generate an interpolated model at a given parameter point. Require `parallel.py`.
