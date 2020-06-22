@@ -7,7 +7,7 @@ AMBRE is a high resolution stellar model templates (de Laverny et al. 2012, A&A,
 
 <!-- ### Input data for interpolation -->
 Out of the AMBRE templates, 3190 model templates with Teff = 5500 - 8000 K and plane-parallel atmosphere are used as input data of the interpolation.
-The spectral resolution is reduced down to 0.01 nm/pix by pixel binning to reduce a number of calculation.
+The spectral resolution is reduced down to 0.01 nm/pix by pixel binning to reduce the number of calculations.
 The templates are stored as a FITS format file of 0.4 MB size. In total, 1.27 GB.
 
 ## Interpolation method
