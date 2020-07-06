@@ -6,20 +6,37 @@ from astropy.io import ascii
 from scipy.interpolate import Rbf 
 import parallel
 import pickle
+import argparse
 
+def makeRBFInterpolationModel(inputDir, inputList, outputModel, n_procs):
+    """
+    Generate an RBF interpolation model from input model spectra.
 
-""" Set input information """
-## inputDir: Directory name of input spectra.
-inputDir = '/data22b/work/takuji/AMBRE/extrapolation20190419/extrapolated_all/'
-## inputList: Ascii table listing parameters to be used for interpolation.
-inputList = '/home/takuji/work/ambre/jn/extrapolatedmodel_parameters_p5500-8000.dat'
-## output: Output file name. 
-output = 'ambreRBF.pickle'
-## n_procs: int. Number of processes. 
-n_procs = 7
+    Parameters
+    ----------
+    inputDir : `str`
+       Directory name in which input spectra are stored.
+    inputList : `str`
+       Ascii table with parameters for interpolation. 
 
+       The comma-separated table should contain the following columns:
 
-def makeRBFInterpolationModel(inputDir, inputList, output, n_procs):
+       - `ModelName` : Spectrum file name. Spectrum should be in FITS format.
+       - `Teff` : Effective temperature in K.
+       - `Logg` : Surface gravity in log(g/(cm s^-2)).
+       - `Z` : Metallicity in [Fe/H].
+       - `Alpha` : Alpha element index in [alpha/Fe].
+
+    n_procs : `int`
+       Number of processes.
+    --outputModel : `str`
+       RBF model file name to be saved. Default is `ambreRBF.pickle`.
+
+    Returns
+    -------
+      RBF model is generated and is saved with `pickle.dump`.
+    """
+
     inputModelList = ascii.read(inputList).to_pandas()
     
     ## fetch columns used for making a model
@@ -48,14 +65,20 @@ def makeRBFInterpolationModel(inputDir, inputList, output, n_procs):
                                     epsilon=2.0)
         return interpolationFunction
     
-    inputFlux = inputFlux[:10,:]
-   
     ## Execute `makeRBFModel` in parallel processsing
     interpolationFunction = parallel.parallel_map(makeRBFModel, inputFlux, n_procs)
 
     ## Save the pickle model
-    with open(output, 'wb') as savePickle:
+    with open(outputModel, 'wb') as savePickle:
         pickle.dump(interpolationFunction, savePickle)
 
 if __name__ == '__main__':
-    makeRBFInterpolationModel(inputDir, inputList, output, n_procs)
+    parser = argparse.ArgumentParser()
+    parser.add_argument('inputDir', help='Directory name of input spectra')
+    parser.add_argument('inputList', help='Ascii table with parameters for interpolation')
+    parser.add_argument('n_procs', type=int, help='int. Number of processes')
+    parser.add_argument('--outputModel', default='ambreRBF.pickle', help='Output model file name')
+    args = parser.parse_args()
+
+    makeRBFInterpolationModel(args.inputDir, args.inputList, args.outputModel, args.n_procs)
+
