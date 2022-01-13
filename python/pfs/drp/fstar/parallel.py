@@ -1,7 +1,3 @@
-# usage:
-#   simply replace `map` with `parallel_map`
-
-
 import multiprocessing
 import threading
 
@@ -12,6 +8,10 @@ job_id_seq = 0
 
 
 def parallel_map(f, items, n_procs=None):
+    """Wrapper of multiprocessing.Pool.map
+
+    To use this, simply replace ``map`` with ``parallel_map``.
+    """
     global job_id_seq
 
     if n_procs == 1:
