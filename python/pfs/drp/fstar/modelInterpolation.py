@@ -6,7 +6,10 @@ import pickle
 
 
 class ModelInterpolation:
-    """Read an RBF picke file model
+    """Model spectrum interpolator.
+
+    This class interpolates a spectrum at a point in the parameter space.
+    (It is not an interpolation in the wavelength space.)
 
     Parameters
     ----------
@@ -52,7 +55,7 @@ class ModelInterpolation:
 
     @classmethod
     def fromPickle(cls, path):
-        """Read an RBF model from a picke file.
+        """Read an RBF model from a pickle file.
 
         Parameters
         ----------
