@@ -5,7 +5,7 @@ import lsst.utils.tests
 class MakeRBFInterpolationModelTestCase(lsst.utils.tests.TestCase):
     def test(self):
         # Tests must be done...
-        assert(makeRBFInterpolationModel is not None)
+        self.assertIsNotNone(makeRBFInterpolationModel)
 
 
 def setup_module(module):

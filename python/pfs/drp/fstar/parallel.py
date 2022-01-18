@@ -15,7 +15,7 @@ def parallel_map(f, items, n_procs=None):
     global job_id_seq
 
     if n_procs == 1:
-        return map(f, items)
+        return list(map(f, items))
     else:
         with lock:
             job_id = job_id_seq
