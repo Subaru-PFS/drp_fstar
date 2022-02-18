@@ -1,0 +1,8 @@
+__pycache__
+/.coverage
+/.pytest*
+/.scons*
+/bin
+/config.log
+/python/pfs/drp/fstar/version.py
+/tests/.tests
