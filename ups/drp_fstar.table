@@ -1,5 +1,6 @@
 setupRequired(sconsUtils)
 setupRequired(utils)
+setupRequired(datamodel)
 setupOptional(fluxmodeldata)
 
 envPrepend(PATH, ${PRODUCT_DIR}/bin)

@@ -1,3 +1,5 @@
+from pfs.datamodel.wavelengthArray import WavelengthArray
+
 import numpy as np
 from . import parallel
 
@@ -27,7 +29,7 @@ class ModelInterpolation:
 
         start = wcs["CRVAL1"] + wcs["CDELT1"] * (1 - wcs["CRPIX1"])
         stop = wcs["CRVAL1"] + wcs["CDELT1"] * (len(model) - wcs["CRPIX1"])
-        self.wavelength = np.linspace(start, stop, num=len(model), endpoint=True, dtype=float)
+        self.wavelength = WavelengthArray(start, stop, len(model), dtype=float)
 
     @classmethod
     def fromFluxModelData(cls, path):
@@ -90,7 +92,7 @@ class ModelInterpolation:
 
         Returns
         -------
-        wavelength : `numpy.ndarray`
+        wavelength : `pfs.datamodel.wavelengthArray.WavelengthArray`
             Wavelength in nm.
         spectrum : `numpy.ndarray`
             Interpolation spectrum.
@@ -101,4 +103,6 @@ class ModelInterpolation:
             return interpolatedFlux
         spectrum = parallel.parallel_map(doInterpolation, self.model, n_procs=nProcs)
 
-        return np.copy(self.wavelength), np.asarray(spectrum)
+        # We don't make a copy of self.wavelength
+        # because it is readonly.
+        return self.wavelength, np.asarray(spectrum)

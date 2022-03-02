@@ -1,4 +1,5 @@
 from pfs.drp.fstar.modelInterpolation import ModelInterpolation
+from pfs.datamodel.wavelengthArray import WavelengthArray
 import lsst.utils
 import lsst.utils.tests
 
@@ -17,6 +18,7 @@ class ModelInterpolationTestCase(lsst.utils.tests.TestCase):
 
         model = ModelInterpolation.fromFluxModelData(dataDir)
         wavelength, flux = model.interpolate(teff=7777, logg=3.333, metal=0.555, alpha=0.222)
+        self.assertIsInstance(wavelength, WavelengthArray)
         self.assertEqual(len(wavelength.shape), 1)
         self.assertEqual(wavelength.shape, flux.shape)
 
